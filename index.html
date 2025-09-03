@@ -1,0 +1,86 @@
+<!-- 
+  Matrix Rain Effect
+  © 2025 Created by Aryan
+  Please do not copy without permission.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Matrix Rain - Created by Aryan</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+    }
+    footer {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      color: #0F0;
+      font-family: monospace;
+      font-size: 14px;
+      opacity: 0.7;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+
+  <!-- Footer credit -->
+  <footer>© 2025 Created by Aryan</footer>
+
+  <script>
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+
+    // Resize canvas to full window
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Characters used in the rain
+    const letters = 'アァイィウヴエェオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const lettersArr = letters.split('');
+
+    const fontSize = 16;
+    const columns = Math.floor(canvas.width / fontSize);
+
+    // Y positions for each column
+    const drops = Array(columns).fill(0);
+
+    function draw() {
+      // Semi-transparent background to create trail effect
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#0F0'; // Matrix green
+      ctx.font = fontSize + 'px monospace';
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = lettersArr[Math.floor(Math.random() * lettersArr.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        // Reset drop randomly after reaching bottom
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+
+    setInterval(draw, 50);
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
+</body>
+</html>
