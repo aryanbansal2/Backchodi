@@ -1,82 +1,153 @@
 <!-- 
-  Matrix Rain Effect
+  Matrix Rain Effect Selector with Color Modes
   © 2025 Created by Aryan
-  Please do not copy without permission.
 -->
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Matrix Rain - Created by Aryan</title>
+  <title>Matrix Rain Selector - Created by Aryan</title>
   <style>
     body {
       margin: 0;
       background: black;
+      color: #0F0;
+      font-family: monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      flex-direction: column;
       overflow: hidden;
     }
+    h1 {
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #0F0;
+    }
+    .menu {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    button {
+      background: transparent;
+      border: 1px solid #0F0;
+      color: #0F0;
+      padding: 10px 20px;
+      margin: 10px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 5px;
+      transition: 0.3s;
+      width: 200px;
+    }
+    button:hover {
+      background: #0F0;
+      color: black;
+      box-shadow: 0 0 15px #0F0;
+    }
     canvas {
-      display: block;
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
     footer {
       position: fixed;
       bottom: 10px;
       right: 10px;
       color: #0F0;
-      font-family: monospace;
       font-size: 14px;
       opacity: 0.7;
-      user-select: none;
     }
   </style>
 </head>
 <body>
-  <canvas id="matrix"></canvas>
+  <h1>Choose Your Matrix Rain</h1>
+  <div class="menu" id="rainMenu">
+    <button onclick="selectRain('normal')">🌧 Normal Rain</button>
+    <button onclick="selectRain('heavy')">🌪 Heavy Rain</button>
+    <button onclick="selectRain('insane')">💀 Insane Rain</button>
+  </div>
 
-  <!-- Footer credit -->
+  <div class="menu" id="colorMenu" style="display:none;">
+    <h1>Choose Color Mode</h1>
+    <button onclick="startRain('green')">🟢 Green</button>
+    <button onclick="startRain('cyan')">🔵 Cyan</button>
+    <button onclick="startRain('rainbow')">🌈 Rainbow</button>
+  </div>
+
+  <canvas id="matrix"></canvas>
   <footer>© 2025 Created by Aryan</footer>
 
   <script>
     const canvas = document.getElementById('matrix');
     const ctx = canvas.getContext('2d');
+    let drops = [];
+    let fontSize, columns, rainMode, colorMode;
 
-    // Resize canvas to full window
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    // Characters used in the rain
-    const letters = 'アァイィウヴエェオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    const lettersArr = letters.split('');
-
-    const fontSize = 16;
-    const columns = Math.floor(canvas.width / fontSize);
-
-    // Y positions for each column
-    const drops = Array(columns).fill(0);
-
-    function draw() {
-      // Semi-transparent background to create trail effect
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = '#0F0'; // Matrix green
-      ctx.font = fontSize + 'px monospace';
-
-      for (let i = 0; i < drops.length; i++) {
-        const text = lettersArr[Math.floor(Math.random() * lettersArr.length)];
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        // Reset drop randomly after reaching bottom
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i]++;
-      }
+    function selectRain(mode) {
+      rainMode = mode;
+      document.getElementById("rainMenu").style.display = "none";
+      document.getElementById("colorMenu").style.display = "flex";
     }
 
-    setInterval(draw, 50);
+    function startRain(color) {
+      colorMode = color;
+      document.querySelector("h1").style.display = "none";
+      document.getElementById("colorMenu").style.display = "none";
+      canvas.style.display = "block";
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
 
-    // Handle window resize
+      const letters = 'アァイィウヴエェオカガキギクグケゲコゴサザシジスズセゼソゾABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      const lettersArr = letters.split('');
+
+      if (rainMode === 'normal') {
+        fontSize = 16;
+        columns = Math.floor(canvas.width / fontSize);
+        drops = Array(columns * 1).fill(0);
+      } else if (rainMode === 'heavy') {
+        fontSize = 12;
+        columns = Math.floor(canvas.width / fontSize);
+        drops = Array(columns * 3).fill(0);
+      } else if (rainMode === 'insane') {
+        fontSize = 10;
+        columns = Math.floor(canvas.width / fontSize);
+        drops = Array(columns * 6).fill(0);
+      }
+
+      function getColor(i) {
+        if (colorMode === 'green') return '#0F0';
+        if (colorMode === 'cyan') return '#0FF';
+        if (colorMode === 'rainbow') {
+          const colors = ['#F00', '#FF0', '#0F0', '#0FF', '#00F', '#F0F'];
+          return colors[i % colors.length];
+        }
+      }
+
+      function draw() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.font = fontSize + 'px monospace';
+
+        for (let i = 0; i < drops.length; i++) {
+          const text = lettersArr[Math.floor(Math.random() * lettersArr.length)];
+          ctx.fillStyle = getColor(i);
+          ctx.fillText(text, (i % columns) * fontSize, drops[i] * fontSize);
+
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          drops[i]++;
+        }
+      }
+
+      setInterval(draw, 50);
+    }
+
     window.addEventListener('resize', () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
